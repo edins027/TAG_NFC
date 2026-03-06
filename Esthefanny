@@ -1,0 +1,8 @@
+const dados={
+nome:"Esthefanny",
+instagram:"https://www.instagram.com/esthefanny.neves",
+whatsapp:"5511977916856",
+pix:"44532495865",
+telefone:"5511977916856",
+email:"esthefannymneves@gmail.com"
+}
