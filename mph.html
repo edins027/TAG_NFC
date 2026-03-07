@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Cartão NFC</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.card{
+background:#1e293b;
+padding:30px;
+border-radius:20px;
+text-align:center;
+width:350px;
+}
+
+img{
+width:120px;
+border-radius:100px;
+margin-bottom:20px;
+}
+
+button{
+width:100%;
+padding:15px;
+margin:8px 0;
+border:none;
+border-radius:10px;
+font-size:16px;
+cursor:pointer;
+}
+
+.instagram{background:#E1306C;color:white;}
+.whatsapp{background:#25D366;color:white;}
+.pix{background:#10b981;color:white;}
+.vcard{background:#3b82f6;color:white;}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<img src="mph.png">
+
+<h2 id="nome">MpH Construtora</h2>
+
+<p id="cargo">gestao de sonhos</p>
+
+<button class="instagram" onclick="abrirInstagram()">
+Instagram
+</button>
+
+<button class="whatsapp" onclick="abrirWhatsapp()">
+Whatsapp
+</button>
+
+<button class="vcard" onclick="baixarContato()">
+Salvar Contato
+</button>
+
+<button class="pix" onclick="copiarPix()">
+Copiar Pix
+</button>
+
+</div>
+
+<script>
+
+const dados={
+nome:"MhH",",
+whatsapp:"5511999999999",
+pix:"mpho",
+telefone:"551199999999",
+email:"contato@mph.com.br"
+}
+
+function abrirInstagram(){
+window.open("https://instagram.com/"+dados.instagram)
+}
+
+function abrirWhatsapp(){
+window.open("https://wa.me/"+dados.whatsapp)
+}
+
+function copiarPix(){
+
+navigator.clipboard.writeText(dados.pix)
+
+alert("Pix copiado!")
+
+}
+
+function baixarContato(){
+
+const vcard=
+`BEGIN:VCARD
+VERSION:3.0
+FN:${dados.nome}
+TEL:+${dados.telefone}
+EMAIL:${dados.email}
+END:VCARD`
+
+const blob=new Blob([vcard],{type:"text/vcard"})
+
+const link=document.createElement("a")
+
+link.href=URL.createObjectURL(blob)
+
+link.download="contato.vcf"
+
+link.click()
+
+}
+
+</script>
+
+</body>
+
+</html>
