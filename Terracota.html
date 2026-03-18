@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MpH Engenharia</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+font-family:'Inter',sans-serif;
+background:url('mph.png') no-repeat center/cover;
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+}
+
+.card{
+background:rgba(255,255,255,0.08);
+backdrop-filter: blur(20px);
+border-radius:28px;
+padding:40px 30px;
+width:90%;
+max-width:360px;
+text-align:center;
+box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+animation:fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+.logo{
+width:75px;
+border-radius:50%;
+margin-bottom:15px;
+}
+
+h2{
+font-weight:600;
+font-size:20px;
+}
+
+p{
+font-size:14px;
+color:rgba(255,255,255,0.7);
+margin-bottom:30px;
+}
+
+.btn{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+width:100%;
+padding:14px;
+margin:10px 0;
+border-radius:14px;
+border:none;
+font-size:15px;
+cursor:pointer;
+
+background:rgba(255,255,255,0.1);
+transition: all .25s ease;
+}
+
+.btn i{
+font-size:16px;
+opacity:0.85;
+}
+
+.btn:hover{
+background:rgba(255,255,255,0.2);
+transform:translateY(-2px);
+}
+
+/* cores sutis */
+.manual i{color:#60a5fa;}
+.planta i{color:#34d399;}
+.contatos i{color:#fbbf24;}
+.garantia i{color:#f87171;}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<img src="mph.png" class="logo">
+
+<h2>MpH Construtora</h2>
+<p>Projeto Terracota</p>
+
+<button class="btn manual" onclick="abrirManual()">
+<i class="fas fa-book"></i> Manual do Usuário
+</button>
+
+<button class="btn planta" onclick="abrirPlanta()">
+<i class="fas fa-drafting-compass"></i> Planta Baixa
+</button>
+
+<button class="btn contatos" onclick="abrirContatos()">
+<i class="fas fa-address-book"></i> Contatos MpH
+</button>
+
+<button class="btn garantia" onclick="abrirGarantia()">
+<i class="fas fa-shield-alt"></i> Garantia
+</button>
+
+</div>
+
+<script>
+
+function abrirManual(){
+window.open("#", "_blank")
+}
+
+function abrirPlanta(){
+window.open("#", "_blank")
+}
+
+function abrirContatos(){
+window.open("#", "_blank")
+}
+
+function abrirGarantia(){
+window.open("#", "_blank")
+}
+
+</script>
+
+</body>
+</html>
