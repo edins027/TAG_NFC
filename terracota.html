@@ -15,7 +15,7 @@
 
 body{
 font-family:'Inter',sans-serif;
-background:url('mphfundo.png') no-repeat center/cover;
+background:url('mph.png') no-repeat center/cover;
 height:100vh;
 display:flex;
 align-items:center;
@@ -66,14 +66,14 @@ background:rgba(255,255,255,0.2);
 transform:translateY(-2px);
 }
 
-/* MODAL PDF */
+/* MODAL */
 .modal{
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.85);
+background:rgba(0,0,0,0.9);
 display:none;
 justify-content:center;
 align-items:center;
@@ -81,45 +81,49 @@ z-index:999;
 }
 
 .modal-content{
-width:90%;
-height:90%;
+width:95%;
+height:95%;
 background:#000;
-border-radius:12px;
+border-radius:16px;
 overflow:hidden;
 position:relative;
 }
 
+/* PDF */
 iframe{
 width:100%;
 height:100%;
 border:none;
 }
 
+/* botão fechar estilo Apple */
 .close{
 position:absolute;
-top:10px;
-right:15px;
-font-size:22px;
+top:15px;
+right:20px;
+font-size:24px;
 color:white;
 cursor:pointer;
+opacity:0.7;
+transition:.3s;
 }
 
-.top-actions{
-position:absolute;
-top:10px;
-left:15px;
-display:flex;
-gap:10px;
+.close:hover{
+opacity:1;
+transform:scale(1.2);
+		  
+			 
+		 
 }
 
-.top-actions button{
-background:rgba(255,255,255,0.2);
-border:none;
-padding:6px 10px;
-border-radius:8px;
-color:white;
-cursor:pointer;
-}
+					
+								 
+			
+				 
+				  
+			
+			   
+ 
 
 </style>
 </head>
@@ -133,7 +137,7 @@ cursor:pointer;
 <h2>Manual do Proprietário</h2>
 <p>Projeto Terracota</p>
 
-<button class="btn" onclick="abrirPDF('zero.pdf')">
+<button class="btn" onclick="abrirPDF('ManualdoProprietario.pdf')">
 <i class="fas fa-book"></i> Manual do Usuário
 </button>
 
@@ -141,11 +145,11 @@ cursor:pointer;
 <i class="fas fa-drafting-compass"></i> Planta Baixa
 </button>
 
-<button class="btn" onclick="abrirPDF('garantia.pdf')">
+<button class="btn" onclick="abrirPDF('contatos.pdf')">
 <i class="fas fa-address-book"></i> Contatos MpH
 </button>
 
-<button class="btn" onclick="abrirPDF('garantia.pdf')">
+<button class="btn" onclick="abrirPDF('Garantia.pdf')">
 <i class="fas fa-shield-alt"></i> Garantia
 </button>
 
@@ -154,10 +158,10 @@ cursor:pointer;
 <!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-content">
-    
-    <div class="top-actions">
-      <button onclick="abrirNovaAba()">Abrir em nova aba</button>
-    </div>
+	
+							 
+																 
+		  
 
     <span class="close" onclick="fecharModal()">&times;</span>
 
@@ -167,15 +171,15 @@ cursor:pointer;
 
 <script>
 
-/* 🔹 Caminho do repositório */
-const basePath = "arquivos/"; // pasta onde ficam os PDFs
+/* caminho da pasta */
+const basePath = "arquivos/";
 
-let pdfAtual = "";
+				  
 
 function abrirPDF(arquivo){
-pdfAtual = basePath + arquivo;
+							  
 
-document.getElementById("pdfFrame").src = pdfAtual;
+document.getElementById("pdfFrame").src = basePath + arquivo;
 document.getElementById("modal").style.display = "flex";
 }
 
@@ -184,9 +188,9 @@ document.getElementById("modal").style.display = "none";
 document.getElementById("pdfFrame").src = "";
 }
 
-function abrirNovaAba(){
-window.open(pdfAtual, "_blank");
-}
+						
+								
+ 
 
 /* fechar clicando fora */
 window.onclick = function(e){
