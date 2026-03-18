@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MpH Engenharia</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+font-family:'Inter',sans-serif;
+background:url('mphfundo.png') no-repeat center/cover;
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+}
+
+.card{
+background:rgba(255,255,255,0.08);
+backdrop-filter: blur(20px);
+border-radius:28px;
+padding:40px 30px;
+width:90%;
+max-width:360px;
+text-align:center;
+box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+.logo{
+width:75px;
+border-radius:50%;
+margin-bottom:15px;
+}
+
+h2{font-weight:600;}
+p{font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:25px;}
+
+.btn{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+width:100%;
+padding:14px;
+margin:10px 0;
+border-radius:14px;
+border:none;
+font-size:15px;
+cursor:pointer;
+background:rgba(255,255,255,0.1);
+transition:.25s;
+color:white;
+}
+
+.btn:hover{
+background:rgba(255,255,255,0.2);
+transform:translateY(-2px);
+}
+
+/* MODAL */
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.9);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:999;
+}
+
+.modal-content{
+width:95%;
+height:95%;
+background:#000;
+border-radius:16px;
+overflow:hidden;
+position:relative;
+}
+
+iframe{
+width:100%;
+height:100%;
+border:none;
+}
+
+.close{
+position:absolute;
+top:15px;
+right:20px;
+font-size:24px;
+color:white;
+cursor:pointer;
+opacity:0.7;
+transition:.3s;
+}
+
+.close:hover{
+opacity:1;
+transform:scale(1.2);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<img src="mph.png" class="logo">
+
+<h2>Manual do Proprietário</h2>
+<p>Projeto Terracota</p>
+
+<button class="btn" onclick="abrirPDF('manual')">
+<i class="fas fa-book"></i> Manual do Usuário
+</button>
+
+<button class="btn" onclick="abrirPDF('planta')">
+<i class="fas fa-drafting-compass"></i> Planta Baixa
+</button>
+
+<button class="btn" onclick="abrirPDF('contatos')">
+<i class="fas fa-address-book"></i> Contatos MpH
+</button>
+
+<button class="btn" onclick="abrirPDF('garantia')">
+<i class="fas fa-shield-alt"></i> Garantia
+</button>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal()">&times;</span>
+    <iframe id="pdfFrame"></iframe>
+  </div>
+</div>
+
+<script>
+
+/* 🔹 COLE AQUI OS IDs DOS SEUS PDFs DO GOOGLE DRIVE */
+const arquivos = {
+manual: "https://drive.google.com/file/d/1d2r2JRRR2OfsEzRfThgC-xxzYwT7XN16/view?usp=sharing",
+planta: "https://drive.google.com/file/d/1U1mnVKHy5S9xNV_jzsv6U0E_b1Z3c96U/view?usp=sharing",
+contatos: "https://drive.google.com/file/d/1r-qMI-UiRoz2bLPmtmoCQNKRCc5eu7AQ/view?usp=sharing",
+garantia: "https://drive.google.com/file/d/1EKrcxJVvDVPGw481cBD0yz0NINvImsEB/view?usp=sharing"
+}
+
+function abrirPDF(tipo){
+
+const fileId = arquivos[tipo]
+
+/* link oficial do Google Drive para embed */
+const url = `https://drive.google.com/file/d/${fileId}/preview`
+
+document.getElementById("pdfFrame").src = url
+document.getElementById("modal").style.display = "flex"
+
+}
+
+function fecharModal(){
+document.getElementById("modal").style.display = "none"
+document.getElementById("pdfFrame").src = ""
+}
+
+window.onclick = function(e){
+const modal = document.getElementById("modal")
+if(e.target == modal){
+fecharModal()
+}
+}
+
+</script>
+
+</body>
+</html>
