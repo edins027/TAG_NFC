@@ -1,115 +1,119 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Cartão NFC</title>
+<title>MpH Engenharia</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-font-family:Arial;
-background:#0f172a;
-color:white;
+font-family:'Poppins',sans-serif;
+background:url('mph.png') no-repeat center/cover;
+height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
 }
 
-.card{
-background:#1e293b;
-padding:30px;
+.overlay{
+background:rgba(15,23,42,0.85);
+padding:35px;
 border-radius:20px;
 text-align:center;
-width:350px;
+width:90%;
+max-width:360px;
+backdrop-filter: blur(10px);
 }
 
-img{
-width:120px;
-border-radius:100px;
-margin-bottom:20px;
+.logo{
+width:90px;
+margin-bottom:15px;
+border-radius:50%;
+}
+
+h2{
+font-weight:600;
+margin-bottom:5px;
+}
+
+p{
+font-size:14px;
+color:#cbd5e1;
+margin-bottom:25px;
 }
 
 button{
 width:100%;
-padding:15px;
+padding:14px;
 margin:8px 0;
 border:none;
 border-radius:10px;
-font-size:16px;
+font-size:15px;
 cursor:pointer;
+font-weight:500;
+transition:.3s;
 }
 
-.instagram{background:#E1306C;color:white;}
-.whatsapp{background:#25D366;color:white;}
-.pix{background:#10b981;color:white;}
-.vcard{background:#3b82f6;color:white;}
+button:hover{
+transform:scale(1.05);
+}
+
+.instagram{background:#E1306C;}
+.whatsapp{background:#25D366;}
+.pix{background:#10b981;}
+.vcard{background:#3b82f6;}
 
 </style>
-
 </head>
 
 <body>
 
-<div class="card">
+<div class="overlay">
 
-<img src="mph.png">
+<img src="mph.png" class="logo">
 
 <h2 id="nome">MpH Construtora</h2>
+<p id="cargo">Gestão de sonhos</p>
 
-<p id="cargo">gestao de sonhos</p>
-
-<button class="instagram" onclick="abrirInstagram()">
-Instagram
-</button>
-
-<button class="whatsapp" onclick="abrirWhatsapp()">
-Whatsapp
-</button>
-
-<button class="vcard" onclick="baixarContato()">
-Salvar Contato
-</button>
-
-<button class="pix" onclick="copiarPix()">
-Copiar Pix
-</button>
+<button class="instagram" onclick="abrirInstagram()">Instagram</button>
+<button class="whatsapp" onclick="abrirWhatsapp()">WhatsApp</button>
+<button class="vcard" onclick="baixarContato()">Salvar Contato</button>
+<button class="pix" onclick="copiarPix()">Copiar Pix</button>
 
 </div>
 
 <script>
 
-const dados={
-nome:"MhH",",
-whatsapp:"5511999999999",
-pix:"mpho",
-telefone:"551199999999",
-email:"contato@mph.com.br"
+const dados = {
+nome: "MpH Construtora",
+instagram: "seuusuario",
+whatsapp: "5511999999999",
+pix: "mph@pix.com",
+telefone: "551199999999",
+email: "contato@mph.com.br"
 }
 
 function abrirInstagram(){
-window.open("https://instagram.com/"+dados.instagram)
+window.open(`https://instagram.com/${dados.instagram}`, '_blank')
 }
 
 function abrirWhatsapp(){
-window.open("https://wa.me/"+dados.whatsapp)
+window.open(`https://wa.me/${dados.whatsapp}`, '_blank')
 }
 
 function copiarPix(){
-
 navigator.clipboard.writeText(dados.pix)
-
 alert("Pix copiado!")
-
 }
 
 function baixarContato(){
 
-const vcard=
+const vcard =
 `BEGIN:VCARD
 VERSION:3.0
 FN:${dados.nome}
@@ -117,20 +121,15 @@ TEL:+${dados.telefone}
 EMAIL:${dados.email}
 END:VCARD`
 
-const blob=new Blob([vcard],{type:"text/vcard"})
+const blob = new Blob([vcard], {type:"text/vcard"})
+const link = document.createElement("a")
 
-const link=document.createElement("a")
-
-link.href=URL.createObjectURL(blob)
-
-link.download="contato.vcf"
-
+link.href = URL.createObjectURL(blob)
+link.download = "contato.vcf"
 link.click()
-
 }
 
 </script>
 
 </body>
-
 </html>
