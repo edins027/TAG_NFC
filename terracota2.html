@@ -93,6 +93,31 @@ height:100%;
 border:none;
 }
 
+/* BOTÕES DO MODAL */
+.top-actions{
+position:absolute;
+top:15px;
+left:20px;
+display:flex;
+gap:10px;
+}
+
+.action-btn{
+background:rgba(255,255,255,0.2);
+padding:8px 12px;
+border-radius:10px;
+cursor:pointer;
+color:white;
+font-size:14px;
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.action-btn:hover{
+background:rgba(255,255,255,0.3);
+}
+
 .close{
 position:absolute;
 top:15px;
@@ -142,14 +167,22 @@ transform:scale(1.2);
 <!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-content">
+
+    <div class="top-actions">
+      <div class="action-btn" onclick="baixarPDF()">
+        <i class="fas fa-download"></i> Salvar
+      </div>
+    </div>
+
     <span class="close" onclick="fecharModal()">&times;</span>
+
     <iframe id="pdfFrame"></iframe>
   </div>
 </div>
 
 <script>
 
-/* 🔹 COLE AQUI OS IDs DOS SEUS PDFs DO GOOGLE DRIVE */
+/* IDs DO GOOGLE DRIVE */
 const arquivos = {
 manual: "1d2r2JRRR2OfsEzRfThgC-xxzYwT7XN16",
 planta: "1U1mnVKHy5S9xNV_jzsv6U0E_b1Z3c96U",
@@ -157,15 +190,26 @@ contatos: "1r-qMI-UiRoz2bLPmtmoCQNKRCc5eu7AQ",
 garantia: "1EKrcxJVvDVPGw481cBD0yz0NINvImsEB"
 }
 
+let arquivoAtual = ""
+
 function abrirPDF(tipo){
 
 const fileId = arquivos[tipo]
+arquivoAtual = fileId
 
-/* link oficial do Google Drive para embed */
+											 
 const url = `https://drive.google.com/file/d/${fileId}/preview`
 
 document.getElementById("pdfFrame").src = url
 document.getElementById("modal").style.display = "flex"
+
+}
+
+function baixarPDF(){
+
+const downloadUrl = `https://drive.google.com/uc?export=download&id=${arquivoAtual}`
+
+window.open(downloadUrl, "_blank")
 
 }
 
