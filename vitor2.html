@@ -59,6 +59,10 @@ p{
 font-size:14px;
 color:rgba(255,255,255,0.7);
 margin-bottom:30px;
+max-width: 260px;
+margin-left: auto;
+margin-right: auto;
+text-wrap: balance;
 }
 
 /* botões estilo Apple */
@@ -100,6 +104,14 @@ transform:translateY(-2px);
 .pix i{color:#10b981;}
 .contato i{color:#60a5fa;}
 
+.linkedin {
+display: none;
+}
+
+  .pix {
+display: none;
+}
+  
 </style>
 </head>
 
@@ -110,7 +122,7 @@ transform:translateY(-2px);
 <img src="vitor.png" class="logo">
 
 <h2>Vitor Forte</h2>
-<p>Engenheiro Civil</p>
+<p>Coordenador de obras residenciais de alto padrão</p>
 
 <button class="btn instagram" onclick="abrirInstagram()">
 <i class="fab fa-instagram"></i> Instagram
@@ -138,12 +150,12 @@ transform:translateY(-2px);
 
 const dados = {
 nome: "Vitor Forte",
-instagram: "seuusuario",
+instagram: "eng.vitorforte",
 whatsapp: "5511970152327",
 linkedin: "seu-linkedin",
 pix: "informarchavepix",
 telefone: "5511970152327",
-email: "informar-email"
+email: "vitor@mphengenharia.com.br"
 }
 
 function abrirInstagram(){
