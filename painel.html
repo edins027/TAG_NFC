@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Painel TAG NFC</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:white;padding:20px;}
+input,button{padding:10px;margin:5px;width:100%;border-radius:8px;border:none;}
+button{background:#2563eb;color:white;cursor:pointer;}
+.card{background:#1e293b;padding:20px;border-radius:10px;max-width:400px;margin:auto;}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Gerar link da TAG</h2>
+
+<input placeholder="Usuário" id="usuario">
+<input placeholder="Obra" id="obra">
+<input placeholder="Senha" id="senha">
+
+<button onclick="gerar()">Gerar Link</button>
+
+<p id="resultado"></p>
+
+</div>
+
+<script>
+function gerar(){
+let u = document.getElementById("usuario").value
+let o = document.getElementById("obra").value
+let s = document.getElementById("senha").value
+
+let url = `https://SEU_GITHUB/TAG_NFC_APP/?usuario=${u}&obra=${o}&senha=${s}`
+
+document.getElementById("resultado").innerText = url
+}
+</script>
+
+</body>
+</html>
