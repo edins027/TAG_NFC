@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fuso Horário — Painel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #11141a;
+    --surface2: #181c24;
+    --border: #232830;
+    --accent: #00e5a0;
+    --accent2: #00b8ff;
+    --warn: #ff6b35;
+    --text: #e8eaf0;
+    --muted: #5a6070;
+    --work-bg: rgba(0,229,160,0.06);
+    --work-border: rgba(0,229,160,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 24px 20px 48px;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 70% 0%, rgba(0,229,160,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 0% 80%, rgba(0,184,255,0.06) 0%, transparent 60%);
+  }
+
+  header {
+    max-width: 960px;
+    margin: 0 auto 32px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  header h1 {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  header span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── HERO CLOCK ── */
+  .hero {
+    max-width: 960px;
+    margin: 0 auto 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 36px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), transparent);
+  }
+
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  #main-time {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  #main-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .work-status {
+    text-align: right;
+    min-width: 140px;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .status-badge.on {
+    background: var(--work-bg);
+    border-color: var(--work-border);
+    color: var(--accent);
+  }
+
+  .status-badge.off {
+    background: rgba(255,107,53,0.08);
+    border-color: rgba(255,107,53,0.25);
+    color: var(--warn);
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .dot.pulse {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  #work-range {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* ── GRID DE FUSOS ── */
+  .section-title {
+    max-width: 960px;
+    margin: 0 auto 14px;
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .clocks-grid {
+    max-width: 960px;
+    margin: 0 auto 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 12px;
+  }
+
+  .clock-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+    position: relative;
+  }
+
+  .clock-card:hover {
+    border-color: #2e3440;
+    transform: translateY(-2px);
+  }
+
+  .clock-card.work-tz {
+    border-color: var(--work-border);
+    background: var(--work-bg);
+  }
+
+  .clock-card.work-tz::after {
+    content: 'TRABALHO';
+    position: absolute;
+    top: 12px; right: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+
+  .card-flag { font-size: 1.4rem; margin-bottom: 6px; }
+
+  .card-city {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .card-country {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .card-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.55rem;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  .card-time.inwork { color: var(--accent); }
+
+  .card-offset {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* ── CONVERSOR ── */
+  .converter {
+    max-width: 960px;
+    margin: 0 auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .converter::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), transparent);
+  }
+
+  .converter h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .converter p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .conv-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+
+  .conv-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .conv-group label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .conv-group input,
+  .conv-group select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 1.1rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    appearance: none;
+  }
+
+  .conv-group input:focus,
+  .conv-group select:focus {
+    border-color: var(--accent2);
+  }
+
+  .conv-group input[type=time] { width: 140px; }
+
+  .conv-arrow {
+    font-size: 1.3rem;
+    color: var(--muted);
+    padding-bottom: 10px;
+    text-align: center;
+  }
+
+  .conv-result {
+    margin-top: 20px;
+    display: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .conv-result.show { display: flex; }
+
+  .result-from {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem;
+    color: var(--accent2);
+    font-weight: 500;
+  }
+
+  .result-sep {
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin: 0 8px;
+  }
+
+  .result-to {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .result-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    width: 100%;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .result-work-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-family: 'DM Mono', monospace;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid;
+  }
+
+  .result-work-note.ok {
+    color: var(--accent);
+    border-color: var(--work-border);
+    background: var(--work-bg);
+  }
+
+  .result-work-note.nok {
+    color: var(--warn);
+    border-color: rgba(255,107,53,0.25);
+    background: rgba(255,107,53,0.06);
+  }
+
+  /* ── ADD BUTTON ── */
+  .add-card {
+    background: transparent;
+    border: 1.5px dashed var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    min-height: 130px;
+  }
+  .add-card:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: rgba(0,184,255,0.04);
+  }
+  .add-card svg { opacity: 0.5; transition: opacity 0.2s; }
+  .add-card:hover svg { opacity: 1; }
+
+  .custom-card { position: relative; }
+  .remove-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1;
+    padding: 2px 5px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .remove-btn:hover { color: var(--warn); background: rgba(255,107,53,0.12); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    width: min(480px, 92vw);
+    position: relative;
+    animation: slideUp 0.2s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 20px 20px 0 0;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), transparent);
+  }
+
+  .modal h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .modal p {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 18px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-field { margin-bottom: 16px; }
+  .modal-field label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .modal-field input,
+  .modal-field select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+  .modal-field input:focus,
+  .modal-field select:focus { border-color: var(--accent2); }
+  .modal-field input::placeholder { color: var(--muted); }
+
+  .modal-search-wrap { position: relative; }
+  .modal-search-wrap input { padding-right: 36px; }
+  .modal-search-icon {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+  }
+
+  .tz-list {
+    max-height: 180px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 6px;
+    background: var(--surface2);
+  }
+  .tz-list-item {
+    padding: 9px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s, color 0.15s;
+    color: var(--muted);
+  }
+  .tz-list-item:last-child { border-bottom: none; }
+  .tz-list-item:hover, .tz-list-item.selected {
+    background: rgba(0,184,255,0.08);
+    color: var(--accent2);
+  }
+  .tz-list-item .tz-name { color: var(--text); font-weight: 500; }
+  .tz-list-item .tz-offset { color: var(--muted); margin-left: 8px; font-size: 0.7rem; }
+  .tz-empty { padding: 14px; text-align: center; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.75rem; }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-primary {
+    flex: 1;
+    background: var(--accent2);
+    color: #0a0c10;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 20px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-cancel {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 10px;
+    padding: 11px 16px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .btn-cancel:hover { color: var(--text); }
+
+  .modal-err {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--warn);
+    margin-top: 8px;
+    display: none;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media(max-width:600px) {
+    .hero { grid-template-columns: 1fr; }
+    .work-status { text-align: left; }
+    .conv-row { grid-template-columns: 1fr 1fr; }
+    .conv-arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Painel de Fusos</h1>
+  <span>GMT−3 · São Paulo</span>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-label">Seu horário — São Paulo (GMT−3)</div>
+    <div id="main-time">--:--:--</div>
+    <div id="main-date">--</div>
+  </div>
+  <div class="work-status">
+    <div class="status-badge off" id="work-badge">
+      <div class="dot pulse"></div>
+      <span id="work-text">Fora do horário</span>
+    </div>
+    <div id="work-range">Expediente: 09:00 – 18:00</div>
+  </div>
+</div>
+
+<!-- CLOCKS GRID -->
+<div style="max-width:960px;margin:0 auto 14px;display:flex;align-items:center;justify-content:space-between;">
+  <div class="section-title" style="margin:0">Cidades & Fusos</div>
+</div>
+<div class="clocks-grid" id="clocks-grid"></div>
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" title="Fechar">&#x2715;</button>
+    <h3>Adicionar fuso horário</h3>
+    <p>Digite o nome da cidade ou país e selecione o fuso na lista.</p>
+    <div class="modal-field">
+      <label>Nome exibido no card</label>
+      <input type="text" id="custom-label" placeholder="Ex: Austin, Texas" maxlength="24">
+    </div>
+    <div class="modal-field">
+      <label>Buscar fuso (cidade, país ou sigla)</label>
+      <div class="modal-search-wrap">
+        <input type="text" id="tz-search" placeholder="Ex: Texas, Tokyo, CST, IST…">
+        <span class="modal-search-icon">&#x1F50D;</span>
+      </div>
+      <div class="tz-list" id="tz-list"></div>
+    </div>
+    <div class="modal-err" id="modal-err">Preencha o nome e selecione um fuso.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="modal-cancel">Cancelar</button>
+      <button class="btn-primary" id="modal-add">+ Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONVERSOR -->
+<div class="section-title">Conversor rápido</div>
+<div class="converter">
+  <h2>Converter horário de outro fuso para o seu</h2>
+  <p>Exemplo: cliente pede reunião às 10:00 AM Central Time → qual é no seu GMT−3?</p>
+  <div class="conv-row">
+    <div class="conv-group">
+      <label>Horário</label>
+      <input type="time" id="conv-time" value="10:00">
+    </div>
+    <div class="conv-group" style="flex:1">
+      <label>Fuso de origem</label>
+      <select id="conv-tz"></select>
+    </div>
+    <div class="conv-arrow">→</div>
+  </div>
+  <div class="conv-result" id="conv-result">
+    <div class="result-label">Equivalente no seu horário (GMT−3 / São Paulo)</div>
+    <span class="result-from" id="res-from">--:--</span>
+    <span class="result-sep" id="res-tz-label"></span>
+    <span class="result-sep">→</span>
+    <span class="result-to" id="res-to">--:--</span>
+    <span class="result-sep">São Paulo</span>
+    <span class="result-work-note ok" id="res-work-note">✓ Dentro do expediente</span>
+  </div>
+</div>
+
+<script>
+// ── TIMEZONE DATA ──
+const MY_TZ = 'America/Sao_Paulo';
+const WORK_START = 9;   // 9am
+const WORK_END   = 18;  // 6pm
+
+const cities = [
+  { city: 'Raleigh',       country: 'EUA (Eastern)',    tz: 'America/New_York',      flag: '🇺🇸', work: true },
+  { city: 'Chicago',       country: 'EUA (Central)',    tz: 'America/Chicago',       flag: '🇺🇸' },
+  { city: 'Denver',        country: 'EUA (Mountain)',   tz: 'America/Denver',        flag: '🇺🇸' },
+  { city: 'Los Angeles',   country: 'EUA (Pacific)',    tz: 'America/Los_Angeles',   flag: '🇺🇸' },
+  { city: 'Mexico City',   country: 'México',           tz: 'America/Mexico_City',   flag: '🇲🇽' },
+  { city: 'Buenos Aires',  country: 'Argentina',        tz: 'America/Argentina/Buenos_Aires', flag: '🇦🇷' },
+  { city: 'Santiago',      country: 'Chile',            tz: 'America/Santiago',      flag: '🇨🇱' },
+  { city: 'Bogotá',        country: 'Colômbia',         tz: 'America/Bogota',        flag: '🇨🇴' },
+  { city: 'Lima',          country: 'Peru',             tz: 'America/Lima',          flag: '🇵🇪' },
+  { city: 'Caracas',       country: 'Venezuela',        tz: 'America/Caracas',       flag: '🇻🇪' },
+  { city: 'Tel Aviv',      country: 'Israel',           tz: 'Asia/Jerusalem',        flag: '🇮🇱' },
+  { city: 'Mumbai',        country: 'Índia',            tz: 'Asia/Kolkata',          flag: '🇮🇳' },
+  { city: 'Londres',       country: 'Reino Unido',      tz: 'Europe/London',         flag: '🇬🇧' },
+  { city: 'Lisboa',        country: 'Portugal',         tz: 'Europe/Lisbon',         flag: '🇵🇹' },
+];
+
+const converterZones = [
+  { label: 'Eastern Time (ET) — Nova York / Raleigh', tz: 'America/New_York' },
+  { label: 'Central Time (CT) — Chicago / Houston',   tz: 'America/Chicago' },
+  { label: 'Mountain Time (MT) — Denver / Phoenix',   tz: 'America/Denver' },
+  { label: 'Pacific Time (PT) — Los Angeles',         tz: 'America/Los_Angeles' },
+  { label: 'México (CST)',                             tz: 'America/Mexico_City' },
+  { label: 'Argentina (ART)',                         tz: 'America/Argentina/Buenos_Aires' },
+  { label: 'Chile',                                   tz: 'America/Santiago' },
+  { label: 'Colômbia / Peru',                         tz: 'America/Bogota' },
+  { label: 'Israel (IDT)',                            tz: 'Asia/Jerusalem' },
+  { label: 'Índia (IST)',                             tz: 'Asia/Kolkata' },
+  { label: 'Reino Unido (BST/GMT)',                   tz: 'Europe/London' },
+  { label: 'Portugal (WET/WEST)',                     tz: 'Europe/Lisbon' },
+  { label: 'UTC / GMT',                               tz: 'UTC' },
+];
+
+// ── BUILD GRID ──
+const grid = document.getElementById('clocks-grid');
+cities.forEach(c => {
+  const card = document.createElement('div');
+  card.className = 'clock-card' + (c.work ? ' work-tz' : '');
+  card.dataset.tz = c.tz;
+  card.innerHTML = `
+    <div class="card-flag">${c.flag}</div>
+    <div class="card-city">${c.city}</div>
+    <div class="card-country">${c.country}</div>
+    <div class="card-time" id="ct-${c.tz.replace(/\//g,'-')}">--:--</div>
+    <div class="card-offset" id="co-${c.tz.replace(/\//g,'-')}"></div>
+  `;
+  grid.appendChild(card);
+});
+
+// ── BUILD CONVERTER SELECT ──
+const sel = document.getElementById('conv-tz');
+converterZones.forEach(z => {
+  const o = document.createElement('option');
+  o.value = z.tz;
+  o.textContent = z.label;
+  sel.appendChild(o);
+});
+
+// ── HELPERS ──
+function nowInTz(tz) {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
+}
+
+function fmtTime(d) {
+  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function fmtTimeShort(d) {
+  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function offsetLabel(tz) {
+  const now = new Date();
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  const tzDate = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+  const myDate = new Date(now.toLocaleString('en-US', { timeZone: MY_TZ }));
+  const diffH = (tzDate - myDate) / 3600000;
+  if (diffH === 0) return 'mesmo fuso';
+  const sign = diffH > 0 ? '+' : '';
+  const h = Math.floor(Math.abs(diffH));
+  const m = Math.round((Math.abs(diffH) - h) * 60);
+  return `${sign}${diffH > 0 ? '+' : '-'}${h}${m ? ':' + String(m).padStart(2,'0') : 'h'} vs. você`;
+}
+
+// ── TICK ──
+function tick() {
+  // MAIN CLOCK
+  const mySP = nowInTz(MY_TZ);
+  document.getElementById('main-time').textContent = fmtTime(mySP);
+  document.getElementById('main-date').textContent = fmtDate(mySP);
+
+  // Work status
+  const h = mySP.getHours() + mySP.getMinutes() / 60;
+  const badge = document.getElementById('work-badge');
+  const wText = document.getElementById('work-text');
+  if (h >= WORK_START && h < WORK_END) {
+    badge.className = 'status-badge on';
+    wText.textContent = 'Em horário de trabalho';
+  } else {
+    badge.className = 'status-badge off';
+    wText.textContent = 'Fora do expediente';
+  }
+
+  // CITY CLOCKS
+  cities.forEach(c => {
+    const d = nowInTz(c.tz);
+    const timeEl = document.getElementById('ct-' + c.tz.replace(/\//g,'-'));
+    const offEl  = document.getElementById('co-' + c.tz.replace(/\//g,'-'));
+    if (timeEl) {
+      timeEl.textContent = fmtTimeShort(d);
+      // Check if city is within their "business" 9-18
+      const ch = d.getHours() + d.getMinutes()/60;
+      if (ch >= 9 && ch < 18) timeEl.classList.add('inwork');
+      else timeEl.classList.remove('inwork');
+    }
+    if (offEl) offEl.textContent = offsetLabel(c.tz);
+  });
+
+  // CONVERTER (live update)
+  updateConverter();
+}
+
+// ── CONVERTER ──
+function updateConverter() {
+  const timeVal = document.getElementById('conv-time').value;
+  const tz = document.getElementById('conv-tz').value;
+  if (!timeVal || !tz) return;
+
+  const [hh, mm] = timeVal.split(':').map(Number);
+
+  // Build a date object "today in that timezone at hh:mm"
+  const now = new Date();
+  // Get "today" in the source TZ
+  const srcNow = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+  srcNow.setHours(hh, mm, 0, 0);
+
+  // Convert: figure out UTC ms for that local time in source TZ
+  // Strategy: use the offset difference
+  const srcOffset = getOffsetMinutes(tz, srcNow);
+  const utcMs = srcNow.getTime() - srcOffset * 60000;
+
+  // Now render in MY_TZ
+  const myDate = new Date(utcMs);
+  const myLocal = new Date(myDate.toLocaleString('en-US', { timeZone: MY_TZ }));
+
+  const fromStr = `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+  const toStr   = `${String(myLocal.getHours()).padStart(2,'0')}:${String(myLocal.getMinutes()).padStart(2,'0')}`;
+
+  document.getElementById('res-from').textContent = fromStr;
+  document.getElementById('res-tz-label').textContent = shortTzLabel(tz);
+  document.getElementById('res-to').textContent = toStr;
+
+  const myH = myLocal.getHours() + myLocal.getMinutes()/60;
+  const note = document.getElementById('res-work-note');
+  if (myH >= WORK_START && myH < WORK_END) {
+    note.className = 'result-work-note ok';
+    note.textContent = '✓ Dentro do seu expediente';
+  } else {
+    note.className = 'result-work-note nok';
+    note.textContent = '✗ Fora do seu expediente (09:00–18:00)';
+  }
+
+  document.getElementById('conv-result').classList.add('show');
+}
+
+function getOffsetMinutes(tz, date) {
+  // Returns UTC offset in minutes for a given tz and approximate date
+  const utcStr = date.toLocaleString('en-US', { timeZone: 'UTC' });
+  const tzStr  = date.toLocaleString('en-US', { timeZone: tz });
+  const utcD   = new Date(utcStr);
+  const tzD    = new Date(tzStr);
+  return (tzD - utcD) / 60000;
+}
+
+function shortTzLabel(tz) {
+  const map = {
+    'America/New_York': 'ET',
+    'America/Chicago': 'CT',
+    'America/Denver': 'MT',
+    'America/Los_Angeles': 'PT',
+    'America/Mexico_City': 'CST',
+    'America/Argentina/Buenos_Aires': 'ART',
+    'America/Santiago': 'CLT',
+    'America/Bogota': 'COT',
+    'Asia/Jerusalem': 'IDT',
+    'Asia/Kolkata': 'IST',
+    'Europe/London': 'BST',
+    'Europe/Lisbon': 'WET',
+    'UTC': 'UTC',
+  };
+  return map[tz] || tz;
+}
+
+document.getElementById('conv-time').addEventListener('input', updateConverter);
+document.getElementById('conv-tz').addEventListener('change', updateConverter);
+
+// ── CUSTOM TIMEZONE ADD ──
+const ALL_TZ = [
+  { label: 'Nova York / Raleigh / Miami',   tz: 'America/New_York',      tags: 'eastern ET EST EDT eua new york florida raleigh' },
+  { label: 'Chicago / Houston / Dallas',    tz: 'America/Chicago',       tags: 'central CT CST CDT texas illinois houston dallas chicago midwest' },
+  { label: 'Austin / San Antonio (Texas)',  tz: 'America/Chicago',       tags: 'texas austin san antonio CT central' },
+  { label: 'Denver / Phoenix',              tz: 'America/Denver',        tags: 'mountain MT MST MDT denver phoenix colorado arizona' },
+  { label: 'Los Angeles / Seattle',         tz: 'America/Los_Angeles',   tags: 'pacific PT PST PDT california los angeles seattle washington' },
+  { label: 'São Paulo (seu fuso)',          tz: 'America/Sao_Paulo',     tags: 'brasil sao paulo BRT BRST GMT-3' },
+  { label: 'Buenos Aires',                  tz: 'America/Argentina/Buenos_Aires', tags: 'argentina ART GMT-3' },
+  { label: 'Santiago',                      tz: 'America/Santiago',      tags: 'chile CLT CLST' },
+  { label: 'Bogotá / Lima / Quito',         tz: 'America/Bogota',        tags: 'colombia peru ecuador COT GMT-5' },
+  { label: 'Caracas',                       tz: 'America/Caracas',       tags: 'venezuela VET GMT-4' },
+  { label: 'Mexico City',                   tz: 'America/Mexico_City',   tags: 'mexico CST CDT GMT-6' },
+  { label: 'Cancún',                        tz: 'America/Cancun',        tags: 'mexico cancun EST GMT-5' },
+  { label: 'Vancouver / Los Angeles',       tz: 'America/Vancouver',     tags: 'canada vancouver PT pacific' },
+  { label: 'Toronto / Ottawa',             tz: 'America/Toronto',       tags: 'canada toronto ET eastern' },
+  { label: 'Winnipeg',                      tz: 'America/Winnipeg',      tags: 'canada CT central' },
+  { label: 'Edmonton / Calgary',            tz: 'America/Edmonton',      tags: 'canada MT mountain alberta' },
+  { label: 'Halifax',                       tz: 'America/Halifax',       tags: 'canada AT atlantic nova scotia' },
+  { label: 'Londres',                       tz: 'Europe/London',         tags: 'uk reino unido GMT BST england' },
+  { label: 'Lisboa',                        tz: 'Europe/Lisbon',         tags: 'portugal WET WEST GMT' },
+  { label: 'Paris / Madrid / Roma',         tz: 'Europe/Paris',          tags: 'franca espanha italia CET CEST GMT+1' },
+  { label: 'Berlim / Amsterdã / Zurique',   tz: 'Europe/Berlin',         tags: 'alemanha holanda suica CET CEST GMT+1' },
+  { label: 'Moscou',                        tz: 'Europe/Moscow',         tags: 'russia MSK GMT+3' },
+  { label: 'Tel Aviv / Jerusalém',          tz: 'Asia/Jerusalem',        tags: 'israel IDT IST GMT+3' },
+  { label: 'Dubai / Abu Dhabi',             tz: 'Asia/Dubai',            tags: 'emirados arabes GST GMT+4' },
+  { label: 'Mumbai / Nova Delhi (Índia)',   tz: 'Asia/Kolkata',          tags: 'india IST GMT+5:30 mumbai delhi' },
+  { label: 'Daca (Bangladesh)',             tz: 'Asia/Dhaka',            tags: 'bangladesh BST GMT+6' },
+  { label: 'Bangcoc / Hanói',              tz: 'Asia/Bangkok',          tags: 'tailandia vietna ICT GMT+7' },
+  { label: 'Cingapura / Kuala Lumpur',     tz: 'Asia/Singapore',        tags: 'cingapura malaisia SGT MYT GMT+8' },
+  { label: 'Hong Kong / Shanghai',         tz: 'Asia/Hong_Kong',        tags: 'china hong kong CST HKT GMT+8' },
+  { label: 'Tóquio / Osaka',              tz: 'Asia/Tokyo',            tags: 'japao JST GMT+9' },
+  { label: 'Seul',                          tz: 'Asia/Seoul',            tags: 'coreia KST GMT+9' },
+  { label: 'Sydney',                        tz: 'Australia/Sydney',      tags: 'australia AEDT AEST GMT+10 GMT+11' },
+  { label: 'Melbourne',                     tz: 'Australia/Melbourne',   tags: 'australia AEDT AEST GMT+10' },
+  { label: 'Auckland',                      tz: 'Pacific/Auckland',      tags: 'nova zelandia NZST NZDT GMT+12' },
+  { label: 'UTC / GMT',                     tz: 'UTC',                   tags: 'UTC GMT universal' },
+  { label: 'Cairo / Harare',               tz: 'Africa/Cairo',          tags: 'egito zimbabwe EET GMT+2' },
+  { label: 'Lagos / Luanda',               tz: 'Africa/Lagos',          tags: 'nigeria angola WAT GMT+1' },
+  { label: 'Nairóbi',                       tz: 'Africa/Nairobi',        tags: 'quenia EAT GMT+3' },
+  { label: 'Joanesburgo',                   tz: 'Africa/Johannesburg',   tags: 'africa do sul SAST GMT+2' },
+];
+
+let selectedTz = null;
+let customCities = [];
+
+function getUtcOffsetLabel(tz) {
+  const now = new Date();
+  const utc = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+  const local = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+  const diffH = (local - utc) / 3600000;
+  const sign = diffH >= 0 ? '+' : '-';
+  const abs = Math.abs(diffH);
+  const h = Math.floor(abs);
+  const m = Math.round((abs - h) * 60);
+  return `GMT${sign}${h}${m ? ':' + String(m).padStart(2,'0') : ''}`;
+}
+
+function renderTzList(query) {
+  const list = document.getElementById('tz-list');
+  const q = query.toLowerCase().trim();
+  const filtered = q.length < 1
+    ? ALL_TZ.slice(0, 12)
+    : ALL_TZ.filter(z =>
+        z.label.toLowerCase().includes(q) ||
+        z.tz.toLowerCase().includes(q) ||
+        z.tags.toLowerCase().includes(q)
+      ).slice(0, 20);
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="tz-empty">Nenhum fuso encontrado. Tente outra busca.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(z => `
+    <div class="tz-list-item${selectedTz === z.tz ? ' selected' : ''}" data-tz="${z.tz}" data-label="${z.label}">
+      <span class="tz-name">${z.label}</span>
+      <span class="tz-offset">${getUtcOffsetLabel(z.tz)}</span>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.tz-list-item').forEach(item => {
+    item.addEventListener('click', () => {
+      selectedTz = item.dataset.tz;
+      if (!document.getElementById('custom-label').value.trim()) {
+        document.getElementById('custom-label').value = item.dataset.label;
+      }
+      renderTzList(document.getElementById('tz-search').value);
+    });
+  });
+}
+
+function addCustomCard(labelText, tz) {
+  const safeId = 'custom-' + tz.replace(/\//g, '-') + '-' + Date.now();
+  const entry = { city: labelText, tz, id: safeId, custom: true };
+  customCities.push(entry);
+
+  const card = document.createElement('div');
+  card.className = 'clock-card custom-card';
+  card.id = 'card-' + safeId;
+  card.dataset.tz = tz;
+  card.innerHTML = `
+    <button class="remove-btn" title="Remover" data-id="${safeId}">&#x2715;</button>
+    <div class="card-flag">🌐</div>
+    <div class="card-city">${labelText}</div>
+    <div class="card-country">${getUtcOffsetLabel(tz)}</div>
+    <div class="card-time" id="ct-${safeId}">--:--</div>
+    <div class="card-offset" id="co-${safeId}"></div>
+  `;
+
+  // Insert before the "add" button card
+  const addCard = document.getElementById('add-card-btn');
+  document.getElementById('clocks-grid').insertBefore(card, addCard);
+
+  card.querySelector('.remove-btn').addEventListener('click', () => {
+    customCities = customCities.filter(c => c.id !== safeId);
+    card.remove();
+  });
+}
+
+// ── ADD CARD BUTTON ──
+const addCardBtn = document.createElement('div');
+addCardBtn.className = 'add-card';
+addCardBtn.id = 'add-card-btn';
+addCardBtn.innerHTML = `
+  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+  Adicionar fuso
+`;
+document.getElementById('clocks-grid').appendChild(addCardBtn);
+
+addCardBtn.addEventListener('click', () => {
+  selectedTz = null;
+  document.getElementById('custom-label').value = '';
+  document.getElementById('tz-search').value = '';
+  document.getElementById('modal-err').style.display = 'none';
+  renderTzList('');
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('tz-search').focus();
+});
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-cancel').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+document.getElementById('tz-search').addEventListener('input', e => {
+  renderTzList(e.target.value);
+});
+
+document.getElementById('modal-add').addEventListener('click', () => {
+  const label = document.getElementById('custom-label').value.trim();
+  const err = document.getElementById('modal-err');
+  if (!label || !selectedTz) {
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  addCustomCard(label, selectedTz);
+  closeModal();
+});
+
+// ── PATCH TICK to also update custom cards ──
+const _origTick = tick;
+function tickWithCustom() {
+  _origTick();
+  customCities.forEach(c => {
+    const d = nowInTz(c.tz);
+    const timeEl = document.getElementById('ct-' + c.id);
+    const offEl  = document.getElementById('co-' + c.id);
+    if (timeEl) {
+      timeEl.textContent = fmtTimeShort(d);
+      const ch = d.getHours() + d.getMinutes()/60;
+      if (ch >= 9 && ch < 18) timeEl.classList.add('inwork');
+      else timeEl.classList.remove('inwork');
+    }
+    if (offEl) offEl.textContent = offsetLabel(c.tz);
+  });
+}
+
+// Restart with patched tick
+clearInterval(window._tickInterval);
+tickWithCustom();
+window._tickInterval = setInterval(tickWithCustom, 1000);
+</script>
+</body>
+</html>
