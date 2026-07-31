@@ -1,27 +1,89 @@
 <!DOCTYPE html>
-<html lang="sp-ar">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>English Simply Speaking</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-
 <!-- Ícones -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-
 body{
 font-family:'Inter',sans-serif;
 background:url('fundo6.jpg') no-repeat center/cover;
-height:100vh;
+min-height:100vh;
 display:flex;
 align-items:center;
 justify-content:center;
 color:white;
+position:relative;
+}
+
+/* seletor de idioma */
+.lang-switcher{
+position:fixed;
+top:16px;
+right:16px;
+z-index:50;
+}
+.lang-btn{
+display:flex;
+align-items:center;
+gap:6px;
+background:rgba(255,255,255,0.12);
+backdrop-filter: blur(14px);
+-webkit-backdrop-filter: blur(14px);
+border:1px solid rgba(255,255,255,0.2);
+color:white;
+padding:8px 12px;
+border-radius:12px;
+font-size:13px;
+font-family:'Inter',sans-serif;
+cursor:pointer;
+transition: all .25s ease;
+}
+.lang-btn:hover{
+background:rgba(255,255,255,0.22);
+}
+.lang-menu{
+position:absolute;
+top:calc(100% + 8px);
+right:0;
+background:rgba(30,30,30,0.85);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+border-radius:14px;
+overflow:hidden;
+min-width:150px;
+box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+display:none;
+flex-direction:column;
+border:1px solid rgba(255,255,255,0.1);
+}
+.lang-menu.open{
+display:flex;
+}
+.lang-option{
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px 14px;
+font-size:13px;
+color:white;
+cursor:pointer;
+background:transparent;
+border:none;
+text-align:left;
+font-family:'Inter',sans-serif;
+transition: background .2s ease;
+}
+.lang-option:hover{
+background:rgba(255,255,255,0.12);
+}
+.lang-option.active{
+background:rgba(255,255,255,0.18);
+font-weight:600;
 }
 
 /* efeito vidro Apple */
@@ -37,24 +99,20 @@ text-align:center;
 box-shadow: 0 10px 40px rgba(0,0,0,0.4);
 animation:fadeIn 0.8s ease;
 }
-
 @keyframes fadeIn{
 from{opacity:0; transform:translateY(20px);}
 to{opacity:1; transform:translateY(0);}
 }
-
 .logo{
 width:75px;
 border-radius:50%;
 margin-bottom:15px;
 }
-
 h2{
 font-weight:600;
 font-size:20px;
 letter-spacing:0.3px;
 }
-
 p{
 font-size:14px;
 color:rgba(255,255,255,0.7);
@@ -64,7 +122,6 @@ margin-left: auto;
 margin-right: auto;
 text-wrap: balance;
 }
-
 /* botões estilo Apple */
 .btn{
 display:flex;
@@ -80,120 +137,165 @@ font-size:15px;
 font-weight:400;
 color:white;
 cursor:pointer;
-
 background:rgba(255,255,255,0.1);
 backdrop-filter: blur(10px);
-
 transition: all .25s ease;
 }
-
 .btn i{
 font-size:16px;
 opacity:0.8;
 }
-
 .btn:hover{
 background:rgba(255,255,255,0.2);
 transform:translateY(-2px);
 }
-
 /* cores sutis por tipo */
 .instagram i{color:#ff7ab6;}
 .whatsapp i{color:#25D366;}
 .linkedin i{color:#0A66C2;}
+.facebook i{color:#1877F2;}
 .pix i{color:#10b981;}
 .contato i{color:#60a5fa;}
-
-  .pix {
+.pix {
 display: none;
 }
-  
+
 </style>
 </head>
-
 <body>
 
+<!-- Seletor de idioma -->
+<div class="lang-switcher">
+  <button class="lang-btn" id="langToggle" onclick="toggleLangMenu()">
+    <i class="fas fa-globe"></i> <span id="langLabel">ES</span> <i class="fas fa-chevron-down" style="font-size:10px;"></i>
+  </button>
+  <div class="lang-menu" id="langMenu">
+    <button class="lang-option" data-lang="es" onclick="setLang('es')">🇪🇸 Español</button>
+    <button class="lang-option" data-lang="en" onclick="setLang('en')">🇬🇧 English</button>
+    <button class="lang-option" data-lang="pt" onclick="setLang('pt')">🇧🇷 Português</button>
+  </div>
+</div>
+
 <div class="card">
-
 <img src="539996082_122105081654993231_7795210673539375867_n.png" class="logo">
-
 <h2>English Simply Speaking</h2>
-<p> Hablar inglés fluido no es imposible.</p>
-
+<p id="subtitle">Hablar inglés fluido no es imposible.</p>
 <button class="btn instagram" onclick="abrirInstagram()">
 <i class="fab fa-instagram"></i> Instagram
 </button>
-
 <button class="btn whatsapp" onclick="abrirWhatsapp()">
 <i class="fab fa-whatsapp"></i> WhatsApp
 </button>
-
 <button class="btn linkedin" onclick="abrirLinkedin()">
 <i class="fab fa-linkedin"></i> LinkedIn
 </button>
-
-<button class="btn contato" onclick="baixarContato()">
-<i class="fas fa-address-card"></i> Salvar Contato
-</button>
-
 <button class="btn facebook" onclick="abrirFacebook()">
-<i class="fas fa-facebook"></i> Facebook
+<i class="fab fa-facebook"></i> Facebook
 </button>
-
+<button class="btn contato" id="btnContato" onclick="baixarContato()">
+<i class="fas fa-address-card"></i> <span id="contatoLabel">Guardar Contacto</span>
+</button>
 </div>
 
 <script>
-
 const dados = {
-nome: "English Simply Speaking",
-instagram: "simplyspeaking4u",
-whatsapp: "5511970152327",
-linkedin: "englishsimplyspeaking",
-facebook: "1D8AZ7ZfKR/",
-telefone: "+5491165741198",
-site: "https://englishsimplyspeaking.com/"
+  nome: "English Simply Speaking",
+  instagram: "simplyspeaking4u",
+  whatsapp: "5511970152327",
+  linkedin: "englishsimplyspeaking",
+  facebook: "1D8AZ7ZfKR",
+  telefone: "+5491165741198",
+  site: "https://englishsimplyspeaking.com/"
 }
+
+// Traduções
+const traducoes = {
+  es: {
+    label: "ES",
+    subtitle: "Hablar inglés fluido no es imposible.",
+    contato: "Guardar Contacto",
+    alertPix: "Clave Pix copiada"
+  },
+  en: {
+    label: "EN",
+    subtitle: "Speaking fluent English is not impossible.",
+    contato: "Save Contact",
+    alertPix: "Pix key copied"
+  },
+  pt: {
+    label: "PT",
+    subtitle: "Falar inglês fluente não é impossível.",
+    contato: "Salvar Contato",
+    alertPix: "Chave Pix copiada"
+  }
+}
+
+function aplicarIdioma(lang){
+  const t = traducoes[lang]
+  document.documentElement.lang = lang === 'pt' ? 'pt-BR' : (lang === 'en' ? 'en' : 'es')
+  document.getElementById('subtitle').textContent = t.subtitle
+  document.getElementById('contatoLabel').textContent = t.contato
+  document.getElementById('langLabel').textContent = t.label
+
+  document.querySelectorAll('.lang-option').forEach(el=>{
+    el.classList.toggle('active', el.dataset.lang === lang)
+  })
+
+  localStorage.setItem('idioma', lang)
+}
+
+function setLang(lang){
+  aplicarIdioma(lang)
+  document.getElementById('langMenu').classList.remove('open')
+}
+
+function toggleLangMenu(){
+  document.getElementById('langMenu').classList.toggle('open')
+}
+
+// fecha o menu ao clicar fora
+document.addEventListener('click', function(e){
+  const switcher = document.querySelector('.lang-switcher')
+  if(!switcher.contains(e.target)){
+    document.getElementById('langMenu').classList.remove('open')
+  }
+})
+
+// idioma inicial: espanhol por padrão (ou o último escolhido pelo usuário)
+const idiomaSalvo = localStorage.getItem('idioma')
+aplicarIdioma(idiomaSalvo || 'es')
 
 function abrirInstagram(){
-window.open(`https://instagram.com/${dados.instagram}`, '_blank')
+  window.open(`https://instagram.com/${dados.instagram}`, '_blank')
 }
-
 function abrirWhatsapp(){
-window.open(`https://wa.me/${dados.whatsapp}`, '_blank')
+  window.open(`https://wa.me/${dados.whatsapp}`, '_blank')
 }
-
 function abrirLinkedin(){
-window.open(`https://linkedin.com/in/${dados.linkedin}`, '_blank')
+  window.open(`https://linkedin.com/in/${dados.linkedin}`, '_blank')
 }
-
 function copiarPix(){
-navigator.clipboard.writeText(dados.pix)
-alert("Chave Pix copiada")
+  navigator.clipboard.writeText(dados.pix)
+  const lang = localStorage.getItem('idioma') || 'es'
+  alert(traducoes[lang].alertPix)
 }
-
 function abrirFacebook(){
-window.open(`https://facebook.com/in/${dados.facebook}`, '_blank')
+  window.open(`https://facebook.com/${dados.facebook}`, '_blank')
 }
-
 function baixarContato(){
-
-const vcard =
+  const vcard =
 `BEGIN:VCARD
 VERSION:3.0
 FN:${dados.nome}
-TEL:+${dados.telefone}
-EMAIL:${dados.email}
+TEL:${dados.telefone}
+URL:${dados.site}
 END:VCARD`
-
-const blob = new Blob([vcard], {type:"text/vcard"})
-const link = document.createElement("a")
-
-link.href = URL.createObjectURL(blob)
-link.download = "contato.vcf"
-link.click()
+  const blob = new Blob([vcard], {type:"text/vcard"})
+  const link = document.createElement("a")
+  link.href = URL.createObjectURL(blob)
+  link.download = "contato.vcf"
+  link.click()
 }
-
 </script>
-
 </body>
 </html>
